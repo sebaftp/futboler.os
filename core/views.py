@@ -14,7 +14,44 @@ def index(request):
 
 @login_required(login_url="signin")
 def settings(request):
-    return render(request, 'setting.html')
+    user_profile = Profile.objects.get(user = request.user)
+
+    if request.method == 'POST':
+
+        # Si no hay una imagen de perfil enviada atraves del formulario:
+        if request.FILES.get('image') == None:
+            image = user_profile.profileimg
+            bio = request.POST['bio']
+            location = request.POST['location']
+            edad = request.POST['age']
+            posicion = request.POST['posicion_preferida']
+
+            user_profile.profileimg = image
+            user_profile.bio = bio
+            user_profile.location = location
+            user_profile.age = edad
+            user_profile.posicion_preferida = posicion
+            user_profile.save()
+
+        if request.FILES.get('image') != None:
+
+            image = request.FILES.get('image')
+            bio = request.POST['bio']
+            location = request.POST['location']
+            edad = request.POST['age']
+            posicion = request.POST['posicion_preferida']
+
+            user_profile.profileimg = image
+            user_profile.bio = bio
+            user_profile.location = location
+            user_profile.age = edad
+            user_profile.posicion_preferida = posicion
+            user_profile.save()
+
+        return redirect('settings')
+
+
+    return render(request, 'setting.html', {'user_profile': user_profile})
 
 def signup(request):
 
@@ -24,6 +61,7 @@ def signup(request):
         email = request.POST['email']
         password = request.POST['password']
         password2 = request.POST['password2']
+        age = request.POST['age']
 
         if password == password2:
             if User.objects.filter(email = email).exists():
@@ -46,7 +84,7 @@ def signup(request):
                 # Creamos el perfil del usuario registrado
 
                 user_model = User.objects.get(username=username) # obtenemos el usuario de la tabla de usuarios
-                new_profile = Profile.objects.create(user=user_model, id_user=user_model.id)
+                new_profile = Profile.objects.create(user=user_model, id_user=user_model.id, age=age)
                 new_profile.save()
                 return redirect('settings')
         else:
