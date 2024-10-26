@@ -3,7 +3,7 @@ from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from .models import Profile, Post
+from .models import Profile, Post, LikePost
 
 # Create your views here.
 
@@ -16,8 +16,6 @@ def index(request):
     posts = Post.objects.all()
 
     return render(request, 'index.html', {'user_profile': user_profile, 'posts': posts})
-
-
 
 @login_required(login_url="signin")
 def upload(request):
@@ -34,19 +32,49 @@ def upload(request):
         return redirect('/')
 
 @login_required(login_url="signin")
+def like_post(request):
+    username = request.user.username
+    post_id = request.GET.get('post_id')
+
+    post = Post.objects.get(id = post_id)
+
+    like_filter = LikePost.objects.filter(post_id = post_id, username = username).first()
+
+    if like_filter == None:
+        new_like = LikePost.objects.create(post_id = post_id, username = username)
+        new_like.save()
+        post.no_of_likes = post.no_of_likes + 1
+        post.save()
+        return redirect('/')
+    else:
+        like_filter.delete()
+        post.no_of_likes = post.no_of_likes - 1
+        post.save()
+        return redirect('/')
+
+def profile(request, pk):
+    return render(request, 'profile.html')
+
+@login_required(login_url="signin")
 def settings(request):
     user_profile = Profile.objects.get(user = request.user)
+    user = User.objects.get(username = request.user.username)
 
     if request.method == 'POST':
 
         # Si no hay una imagen de perfil enviada atraves del formulario:
         if request.FILES.get('image') == None:
+            first_name = request.POST['first_name']
+            last_name = request.POST['last_name']
             image = user_profile.profileimg
             bio = request.POST['bio']
             location = request.POST['location']
             edad = request.POST['age']
             posicion = request.POST['posicion_preferida']
 
+            user.first_name = first_name # actualizamos el nombre del usuario
+            user.last_name = last_name # actualizamos el apellido del usuario
+            user.save()
             user_profile.profileimg = image
             user_profile.bio = bio
             user_profile.location = location
@@ -56,12 +84,17 @@ def settings(request):
 
         if request.FILES.get('image') != None:
 
+            first_name = request.POST['first_name']
+            last_name = request.POST['last_name']
             image = request.FILES.get('image')
             bio = request.POST['bio']
             location = request.POST['location']
             edad = request.POST['age']
             posicion = request.POST['posicion_preferida']
-
+            
+            user.first_name = first_name # actualizamos el nombre del usuario
+            user.last_name = last_name # actualizamos el apellido del usuario
+            user.save()
             user_profile.profileimg = image
             user_profile.bio = bio
             user_profile.location = location
@@ -79,6 +112,8 @@ def signup(request):
     # Registramos el usuario de usuario :0
     if request.method == 'POST':
         username = request.POST['username']
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
         email = request.POST['email']
         password = request.POST['password']
         password2 = request.POST['password2']
@@ -93,6 +128,8 @@ def signup(request):
                 return redirect('signup')
             else:
                 user = User.objects.create_user(username=username,
+                                                first_name=first_name,
+                                                last_name=last_name,
                                                 email=email,
                                                 password=password)
                 user.save()

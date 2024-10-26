@@ -46,19 +46,25 @@
 
                     <form action="" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
-                       <div class="grid grid-cols-2 gap-3 lg:p-6 p-4">
-                           {% comment %} <div>
-                               <label for=""> First name</label>
-                               <input type="text" placeholder="Your name.." class="shadow-none bg-gray-100">
-                           </div>
-                           <div>
-                               <label for=""> Last name</label>
-                               <input type="text" placeholder="Your name.." class="shadow-none bg-gray-100">
-                            </div>
+
+                        
+
+                        <div class="grid grid-cols-2 gap-3 lg:p-6 p-4">
                             <div class="col-span-2">
-                                <label for=""> Email</label>
-                                <input type="text" placeholder="Your name.." class="shadow-none bg-gray-100">
-                            </div> {% endcomment %}
+                                <label for=""> Nombre</label>
+                                <input type="text" value="{{user.username}}" class="shadow-none bg-gray-100" Disabled>
+                            </div> 
+
+                            <div>
+                                <label for=""> Apellido Paterno</label>
+                                <input type="text" name="first_name" value="{{user.first_name}}" class="shadow-none bg-gray-100" >
+                            </div>
+                            <div>
+                                <label for=""> Apellido Materno</label>
+                                <input type="text" name="last_name" value="{{user.last_name}}" class="shadow-none bg-gray-100" >
+                                </div>
+                            
+                            
 
                             <div class="col-span-2">
                                 <label for=""> Foto de perfil</label>
@@ -66,6 +72,8 @@
                                 
                                 <input type="file" name="image" value="" class="shadow-none bg-gray-100">
                             </div>
+
+
 
                             <div class="col-span-2">
                                 <label for="about">Biografia</label>  
