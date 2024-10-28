@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Configuración del Grupo</title>
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+</head>
+<body>
+
+<div class="container">
+    <h1>Configuración del Grupo</h1>
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div>
+            <label for="group_name">Nombre del Grupo</label>
+            <input type="text" name="group_name" value="{{ user_group.group_name }}" {% if not user_group %}placeholder="Nombre del nuevo grupo"{% endif %}>
+        </div>
+
+        <div>
+            <label for="bio">Biografía del Grupo</label>
+            <textarea name="bio" rows="3">{{ user_group.bio }}</textarea>
+        </div>
+
+        <div>
+            <label for="logo">Logo del Grupo</label>
+            {% if user_group and user_group.logo %}
+                <img src="{{ user_group.logo.url }}" alt="Logo" width="100">
+            {% endif %}
+            <input type="file" name="logo">
+        </div>
+
+        <div>
+            <label for="banner">Banner del Grupo</label>
+            {% if user_group and user_group.banner %}
+                <img src="{{ user_group.banner.url }}" alt="Banner" width="200">
+            {% endif %}
+            <input type="file" name="banner">
+        </div>
+
+        <button type="submit">Guardar</button>
+    </form>
+</div>
+
+</body>
+</html>
