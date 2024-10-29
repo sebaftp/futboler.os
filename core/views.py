@@ -4,6 +4,7 @@ from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
+from itertools import chain
 from .models import Profile, Post, LikePost, Group
 
 # Create your views here.
@@ -31,6 +32,33 @@ def upload(request):
         return redirect('/')
     else:
         return redirect('/')
+
+@login_required(login_url="signin")
+def search(request):
+    # Obtenemos el usuario actual
+    user_object = User.objects.get(username = request.user.username)
+    user_profile = Profile.objects.get(user = user_object)
+
+    # Si el método de la solicitud es POST
+    if request.method == 'POST':
+        username = request.POST['username']
+        username_object = User.objects.filter(username__icontains = username)
+
+        # Creamos listas para almacenar los IDs de usuario y los perfiles de usuario
+        username_profile = []
+        username_profile_list = []
+
+        # Iteramos sobre los objetos de usuario encontrados
+        for users in username_object:
+            username_profile.append(users.id)
+
+        for ids in username_profile:
+            profile_list = Profile.objects.filter(id_user = ids)
+            username_profile_list.append(profile_list)
+
+        username_profile_list = list(chain(*username_profile_list))
+
+        return render(request, 'search.html', {'user_profile': user_profile, 'username_profile_list': username_profile_list})
 
 @login_required(login_url="signin")
 def like_post(request):
