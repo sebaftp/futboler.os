@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from itertools import chain
 from .models import Profile, Post, LikePost, Group
@@ -12,12 +12,32 @@ from .models import Profile, Post, LikePost, Group
 # DEfinimos la url en la que el usuario sera redirigido si no a iniciado sesión
 @login_required(login_url="signin")
 def index(request):
-    user_object = User.objects.get(username = request.user.username)
-    user_profile = Profile.objects.get(user = user_object)
-
-    posts = Post.objects.all()
-
-    return render(request, 'index.html', {'user_profile': user_profile, 'posts': posts})
+    try:
+        user_object = User.objects.get(username=request.user.username)
+        print(f"Usuario encontrado: {user_object.username}")
+        
+        try:
+            user_profile = Profile.objects.get(user=user_object)
+            print(f"Perfil encontrado: {user_profile.id}")
+        except Profile.DoesNotExist:
+            print(f"No se encontró perfil para el usuario {user_object.username}")
+            print("Perfiles existentes:", Profile.objects.all().values_list('user__username', flat=True))
+            # Podemos ver si hay algún problema con el id_user
+            print(f"ID del usuario: {user_object.id}")
+            
+            # Intentar buscar el perfil por id_user
+            profile_by_id = Profile.objects.filter(id_user=user_object.id).first()
+            if profile_by_id:
+                print(f"Se encontró perfil por id_user: {profile_by_id.id}")
+            
+            raise  # Re-lanza la excepción original
+        
+        posts = Post.objects.all()
+        return render(request, 'index.html', {'user_profile': user_profile, 'posts': posts})
+        
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        raise
 
 @login_required(login_url="signin")
 def upload(request):
@@ -62,24 +82,49 @@ def search(request):
 
 @login_required(login_url="signin")
 def like_post(request):
-    username = request.user.username
-    post_id = request.GET.get('post_id')
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        username = request.user.username
+        post_id = request.GET.get('post_id')
+        
+        post = Post.objects.get(id = post_id)
 
-    post = Post.objects.get(id = post_id)
+        like_filter = LikePost.objects.filter(post_id = post_id, username = username).first()
 
-    like_filter = LikePost.objects.filter(post_id = post_id, username = username).first()
+        if like_filter == None:
+            new_like = LikePost.objects.create(post_id = post_id, username = username)
+            new_like.save()
+            post.no_of_likes = post.no_of_likes + 1
+            post.save()
+        else:
+            like_filter.delete()
+            post.no_of_likes = post.no_of_likes - 1
+            post.save()
 
-    if like_filter == None:
-        new_like = LikePost.objects.create(post_id = post_id, username = username)
-        new_like.save()
-        post.no_of_likes = post.no_of_likes + 1
-        post.save()
-        return redirect('/')
-    else:
-        like_filter.delete()
-        post.no_of_likes = post.no_of_likes - 1
-        post.save()
-        return redirect('/')
+        return JsonResponse({
+            "status": "success",
+            "likes": post.no_of_likes
+        })
+    return redirect('/')
+
+
+    # username = request.user.username
+    # post_id = request.GET.get('post_id')
+
+    # post = Post.objects.get(id = post_id)
+
+    # like_filter = LikePost.objects.filter(post_id = post_id, username = username).first()
+
+    # if like_filter == None:
+    #     new_like = LikePost.objects.create(post_id = post_id, username = username)
+    #     new_like.save()
+    #     post.no_of_likes = post.no_of_likes + 1
+    #     post.save()
+    #     return redirect('/')
+    # else:
+    #     like_filter.delete()
+    #     post.no_of_likes = post.no_of_likes - 1
+    #     post.save()
+    #     return redirect('/')
 
 @login_required(login_url="signin")
 def profile(request, pk):
