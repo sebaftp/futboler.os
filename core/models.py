@@ -6,13 +6,13 @@ from datetime import datetime
 User = get_user_model()
 
 class Group(models.Model):
-    id_group = models.AutoField(primary_key=True)
-    group_name = models.CharField(max_length=100, unique=True)
+    id = models.AutoField(primary_key=True)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
+    group_name = models.CharField(max_length=100)
     bio = models.TextField(blank=True)
-    logo = models.ImageField(upload_to='group_logos', default='default_logo.jpg')
-    banner = models.ImageField(upload_to='group_banners', default='default_banner.jpg')
+    logo = models.ImageField(upload_to='group_logos', default='default_logo.png')
+    banner = models.ImageField(upload_to='group_banners', default='default_banner.png')
     created_at = models.DateTimeField(auto_now_add=True)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_groups")
 
     def __str__(self):
         return self.group_name

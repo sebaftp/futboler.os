@@ -107,25 +107,6 @@ def like_post(request):
     return redirect('/')
 
 
-    # username = request.user.username
-    # post_id = request.GET.get('post_id')
-
-    # post = Post.objects.get(id = post_id)
-
-    # like_filter = LikePost.objects.filter(post_id = post_id, username = username).first()
-
-    # if like_filter == None:
-    #     new_like = LikePost.objects.create(post_id = post_id, username = username)
-    #     new_like.save()
-    #     post.no_of_likes = post.no_of_likes + 1
-    #     post.save()
-    #     return redirect('/')
-    # else:
-    #     like_filter.delete()
-    #     post.no_of_likes = post.no_of_likes - 1
-    #     post.save()
-    #     return redirect('/')
-
 @login_required(login_url="signin")
 def profile(request, pk):
     #Obtener el usuario del perfil basado en el `pk` (id o nombre de usuario)
@@ -200,36 +181,44 @@ def settings(request):
 
 @login_required(login_url="signin")
 def groupsetting(request):
-    # Obtener el usuario directamente del request
     user = request.user
-
-    # Intentar obtener el grupo del cual el usuario es creador
     user_group = Group.objects.filter(creator=user).first()
 
     if request.method == 'POST':
-        # Procesamiento de creación o actualización del grupo
-        group_name = request.POST['group_name']
-        bio = request.POST['bio']
-        logo = request.FILES.get('logo') if request.FILES.get('logo') else (user_group.logo if user_group else None)
-        banner = request.FILES.get('banner') if request.FILES.get('banner') else (user_group.banner if user_group else None)
-        
-        if user_group:
-            # Actualizar el grupo existente
-            user_group.group_name = group_name
-            user_group.bio = bio
-            user_group.logo = logo
-            user_group.banner = banner
-            user_group.save()
-        else:
-            # Crear un nuevo grupo
-            Group.objects.create(
-                creator=user,
-                group_name=group_name,
-                bio=bio,
-                logo=logo,
-                banner=banner,
-            )
-        return redirect('index')
+        try:
+            group_name = request.POST['group_name']
+            bio = request.POST['bio']
+            logo = request.FILES.get('logo') if request.FILES.get('logo') else (user_group.logo if user_group else None)
+            banner = request.FILES.get('banner') if request.FILES.get('banner') else (user_group.banner if user_group else None)
+            
+            print(f"Creando grupo: {group_name}")  # Log
+            
+            if user_group:
+                # Actualizar grupo existente
+                user_group.group_name = group_name
+                user_group.bio = bio
+                user_group.logo = logo
+                user_group.banner = banner
+                user_group.save()
+                print(f"Grupo actualizado: {user_group.id}")  # Log
+            else:
+                # Crear nuevo grupo
+                user_group = Group.objects.create(
+                    creator=user,
+                    group_name=group_name,
+                    bio=bio,
+                    logo=logo,
+                    banner=banner,
+                )
+                print(f"Nuevo grupo creado: {user_group.id}")  # Log
+                
+                user.profile.groups.add(user_group)
+                print("Usuario añadido al grupo")  # Log
+
+            return redirect(reverse('group_detail', args=[user_group.id]))
+        except Exception as e:
+            print(f"Error al crear/actualizar grupo: {str(e)}")  # Log error
+            raise e
 
     return render(request, 'groupsetting.html', {'user_profile': user.profile, 'user_group': user_group})
 
@@ -246,13 +235,36 @@ def my_team(request):
     else:
         # Si no pertenece a un grupo, redirige a la configuración de creación de equipo
         return redirect('groupsetting')
-    
+
+@login_required(login_url="signin")
 def group_detail(request, id):
     group = get_object_or_404(Group, id=id)
-    return render(request, 'groups.html', {'group': group})
+    user_profile = Profile.objects.get(user=request.user)
+
+    # Check if the current user is the creator of the group
+    is_creator = (group.creator == request.user)
+
+    context = {
+        'group': group,
+        'user_profile': user_profile,
+        'is_creator': is_creator,
+    }
+    return render(request, 'groups.html', context)
+
+@login_required(login_url="signin")
+def delete_group(request, id):
+    group = get_object_or_404(Group, id=id)
+
+    if group.creator == request.user:
+        group.delete()
+        messages.success(request, "Grupo eliminado con éxito.")
+        return redirect('index')
+    else:
+        messages.error(request, "No tienes permisos para eliminar este grupo.")
+        return redirect('index')
+    
 
 def signup(request):
-
     # Registramos el usuario de usuario :0
     if request.method == 'POST':
         username = request.POST['username']
