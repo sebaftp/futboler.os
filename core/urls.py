@@ -18,4 +18,5 @@ urlpatterns = [
     path('signup', views.signup, name='signup'),
     path('signin', views.signin, name='signin'),
     path('logout', views.logout, name='logout'),
+    path('chat', views.messages_page, name='messages'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

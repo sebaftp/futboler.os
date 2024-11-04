@@ -329,3 +329,9 @@ def signin(request):
 def logout(request):
     auth.logout(request)
     return redirect('signin')
+
+# Vista de Chats
+@login_required(login_url="signin")
+def messages_page(request):
+    return render(request, 'messages.html')
+

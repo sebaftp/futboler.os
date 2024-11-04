@@ -34,6 +34,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -71,8 +72,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'social_book.wsgi.application'
-
+# WSGI_APPLICATION = 'social_book.wsgi.application'
+ASGI_APPLICATION = 'social_book.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
