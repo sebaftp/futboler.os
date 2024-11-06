@@ -110,21 +110,22 @@ def like_post(request):
 
 @login_required(login_url="signin")
 def profile(request, pk):
-    #Obtener el usuario del perfil basado en el `pk` (id o nombre de usuario)
+    # Obtener el perfil del usuario logueado (para la barra de navegación)
+    logged_user_profile = Profile.objects.get(user=request.user)
+    
+    # Obtener el perfil que se está visitando
     user_profile = get_object_or_404(Profile, user__username=pk) 
     user = user_profile.user
 
-    #Obtener todas las publicaciones del usuario
+    # Obtener todas las publicaciones del usuario
     user_posts = Post.objects.filter(user=pk)
 
-    # Obtener el número de publicaciones del usuario
-    user_posts_length = len(user_posts)
-
     context = {
-        'user_profile': user_profile,
+        'logged_user_profile': logged_user_profile,  # Perfil del usuario logueado
+        'user_profile': user_profile,                # Perfil que se está visitando
         'user': user,
         'user_posts': user_posts,
-        'user_posts_length': user_posts_length,
+        'user_posts_length': len(user_posts),
     }
     return render(request, 'profile.html', context)
 
