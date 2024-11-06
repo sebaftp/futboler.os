@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Partidos</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="body-m">
+
+    <!-- Barra de navegación -->
+    <div class="nav">
+        <h1 class="title">Historial</h1>
+        <div class="navbar-icons">
+            <a href="#"><i class="fas fa-home"></i></a>
+            <a href="#"><i class="fas fa-futbol"></i></a>
+            <a href="#"><i class="fas fa-users"></i></a>
+            <a href="#"><i class="fas fa-bell"></i></a>
+            <a href="#"><i class="fas fa-cog"></i></a>
+        </div>
+    </div>
+
+    <!-- Lista de partidos -->
+    <div class="match-list">
+        {% for partido in partidos %}
+            <div class="match-item">
+                <div class="team-logos">
+                    <img src="{{ partido.equipo1.logo.url }}" alt="Logo equipo 1" class="team-logo">
+                    <img src="{{ partido.equipo2.logo.url }}" alt="Logo equipo 2" class="team-logo">
+                </div>
+                <div class="match-info">
+                    <h4 class="team-names">
+                        <span class="team-name">{{ partido.equipo1.nombre }}</span>
+                        <span class="vs-text">vs</span>
+                        <span class="team-name">{{ partido.equipo2.nombre }}</span>
+                    </h4>
+                    <p class="score">{{ partido.goles_equipo1 }} - {{ partido.goles_equipo2 }}</p>
+                    <p class="match-date">Fecha: {{ partido.fecha }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

@@ -129,6 +129,17 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'), )
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Configuración de Channels
+CHANNEL_LAYERS = {
+    'default': {
+        # Configuración de memoria, esto lo usaremos en desarrollo
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+        # Configuración de Redis, esto lo usaremos en producción
+        # 'CONFIG': {
+        #     'hosts': [('127.0.0.1', 6379)],
+        # }
+    },
+}
 # Hacemos que django reconozca los medios ingresados por el usuario
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

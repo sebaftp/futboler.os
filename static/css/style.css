@@ -10056,4 +10056,126 @@ aside.sidebar.full-style {
     text-transform: uppercase;
 }
 
+/*--------------------------------------------------------------Aqui va lo nuevo------------------------------------------------*/
+/*--------------------------------------------------------------Parte para historial---------------------------------------------- */
+
+.title {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 10px;
+    margin-left: 20px; 
+}
+
+.nav {
+    position: fixed;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: #28a745; /* Color verde */
+    padding: 10px 0;
+    z-index: 1000; /* Mantiene la barra encima */
+}
+
+.navbar-icons {
+    display: flex;
+    justify-content: flex-start; 
+    margin-left: 30px;
+}
+
+.navbar-icons a {
+    color: white;
+    font-size: 1.5em;
+    text-decoration: none;
+    padding: 10px 10px;
+    margin-right: 30px;
+}
+
+.navbar-icons a:hover {
+    color: #f0a500;
+}
+
+/* Estilos de la lista de partidos */
+.match-list {
+    padding: 20px;
+    max-width: 600px;
+    margin: 20px auto 0 auto; /* Espacio debajo de la barra de navegación */
+}
+
+.match-item {
+    margin-top: 60px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Estilos para mostrar ambas imágenes de los equipos */
+.team-logos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.team-logo {
+    width: 80px; /* Ajusta el tamaño */
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 75px;
+}
+
+.vs-text {
+    font-weight: bold;
+    color: #333;
+    margin: 0 25px;
+}
+
+.team-names {
+    font-size: 2.2em;
+    font-weight: bold;
+    margin: 15px 0;
+    color: #333;
+}
+
+.team-name {
+    flex: 1;
+    text-align: center;
+}
+
+.score {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin: 15px 0;
+    color: #333;
+}
+
+.match-date {
+    color: #888;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+/*---------------------------------------------------------Para reportes------------------------------------------*/
+.body-m, html {
+    height: 100%;
+    margin: 0;
+    background-color: #e0e0e0; /* Color de fondo gris */
+}
+
+.n-User {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: black;
+    margin-left: 20px;
+}
+
+.mb-3 {
+    text-align: left;
+    font-weight: bold;
+    font-size: 1.2em;
+}
 

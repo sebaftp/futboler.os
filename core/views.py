@@ -5,7 +5,8 @@ from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from itertools import chain
-from .models import Profile, Post, LikePost, Group
+from django.db.models import Q
+from .models import Profile, Post, LikePost, Group, Thread, ChatMessage, Partido, Reporte
 
 # Create your views here.
 
@@ -333,5 +334,39 @@ def logout(request):
 # Vista de Chats
 @login_required(login_url="signin")
 def messages_page(request):
-    return render(request, 'messages.html')
+    threads = Thread.objects.filter(
+        Q(first_person=request.user) | 
+        Q(second_person=request.user)
+    ).prefetch_related('chatmessage_thread').order_by('-updated')
+    
+    context = {
+        'Thread': threads
+    }
+    return render(request, 'messages.html', context)
 
+def history(request):
+    partidos = Partido.objects.all().order_by('-fecha')  # Ordena por fecha
+    return render(request, 'history.html', {'partidos': partidos})
+
+def report_view(request, user_report_id):
+    usuario_reportado = get_object_or_404(User, id=user_report_id)
+    perfil_reportado = get_object_or_404(Profile, user=usuario_reportado)
+    
+    if request.method == 'POST':
+        motivo = request.POST.get('motivo')
+        descripcion = request.POST.get('descripcion')
+
+        reporte = Reporte(
+            usuario=request.user if request.user.is_authenticated else None,
+            user_report=usuario_reportado,
+            motivo=motivo,
+            descripcion=descripcion
+        )
+        reporte.save()
+        
+        messages.success(request, '¡Reporte enviado con éxito!')
+    
+    return render(request, 'report.html', {
+        'usuario_reportado': usuario_reportado,
+        'perfil_reportado': perfil_reportado
+    })
