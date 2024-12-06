@@ -9,16 +9,46 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body class="body-m">
-
-    <!-- Barra de navegación -->
-    <div class="nav">
-        <h1 class="title">Historial</h1>
-        <div class="navbar-icons">
-            <a href="#"><i class="fas fa-home"></i></a>
-            <a href="#"><i class="fas fa-futbol"></i></a>
-            <a href="#"><i class="fas fa-users"></i></a>
-            <a href="#"><i class="fas fa-bell"></i></a>
-            <a href="#"><i class="fas fa-cog"></i></a>
+    <div class="theme-layout">
+        <!-- Barra de navegación -->
+        <div class="nav" style="display: flex; align-items: center; justify-content: space-between;">
+            <!-- Sección izquierda: Título y elementos principales -->
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <h1 class="title">Configuración Equipos</h1>
+                <div class="navbar-icons" style="display: flex; gap: 10px;">
+                    <a href="/"><i class="fas fa-home"></i></a>
+                    <a href="#"><i class="fas fa-futbol"></i></a>
+                    <a href="{% url 'my_team' %}"><i class="fas fa-users"></i></a>
+                    <a href="#"><i class="fas fa-bell"></i></a>
+                    <a href="setting"><i class="fas fa-cog"></i></a>
+                </div>
+            </div>
+    
+            <!-- Sección derecha: Foto de perfil con menú desplegable -->
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <!-- Formulario de búsqueda -->
+                <form action="/search" method="POST" class="lg:block hidden" style="margin-right: 10px;">
+                    {% csrf_token %}
+                    <input type="text" name="username" placeholder="Busca un usuario... o equipo">
+                </form>
+    
+                <!-- Foto de perfil -->
+                <a href="#">
+                    <img 
+                        src="{{user_profile.profileimg.url}}" 
+                        alt="Foto de perfil" 
+                        style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                </a>
+                <div uk-drop="mode: click;offset:9" class="header_dropdown profile_dropdown border-t">
+                    <ul>
+                        <li><a href="/profile/{{user.username}}">Mi Perfil</a></li>
+                        <li><a href="{% url 'my_team' %}" title="Mi Equipo">Mi Equipo</a></li>
+                        <li><a href="/settings">Configuración</a></li>
+                        <li><a href="#">Ayuda</a></li>
+                        <li><a href="logout">Cerrar Sesión</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 

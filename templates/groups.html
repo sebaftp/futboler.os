@@ -1,5 +1,3 @@
-{% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,6 +8,7 @@
     <meta name="keywords" content="" />
     <title>Futboler.os - {{ user.group.name }}</title>
 
+    {% load static %}
     <link rel="stylesheet" href="{% static 'css/main.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/color.css' %}">
@@ -18,264 +17,94 @@
     <link rel="stylesheet" href="{% static 'assets/css/uikit.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/tailwind.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+{% csrf_token %}
+	<div class="theme-layout">
+        <!-- Barra de navegación -->
+        <div class="nav" style="display: flex; align-items: center; justify-content: space-between;">
+            <!-- Sección izquierda: Título y elementos principales -->
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <h1 class="title">Equipo</h1>
+                <div class="navbar-icons" style="display: flex; gap: 10px;">
+                    <a href="/"><i class="fas fa-home"></i></a>
+                    <a href="#"><i class="fas fa-futbol"></i></a>
+                    <a href="{% url 'my_team' %}"><i class="fas fa-users"></i></a>
+                    <a href="#"><i class="fas fa-bell"></i></a>
+                    <a href="setting"><i class="fas fa-cog"></i></a>
+                </div>
+            </div>
+    
+            <!-- Sección derecha: Foto de perfil con menú desplegable -->
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <!-- Formulario de búsqueda -->
+                <form action="/search" method="POST" class="lg:block hidden" style="margin-right: 10px;">
+                    {% csrf_token %}
+                    <input type="text" name="username" placeholder="Busca un usuario... o equipo">
+                </form>
+    
+                <!-- Foto de perfil -->
+                <a href="#">
+                    <img 
+                        src="{{user_profile.profileimg.url}}" 
+						href="/profile/{{user.username}}"
+                        alt="Foto de perfil" 
+                        style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                </a>
+                <div uk-drop="mode: click;offset:9" class="header_dropdown profile_dropdown border-t">
+                    <ul>
+                        <li><a href="/profile/{{user.username}}">Mi Perfil</a></li>
+                        <li><a href="{% url 'my_team' %}" title="Mi Equipo">Mi Equipo</a></li>
+                        <li><a href="/settings">Configuración</a></li>
+                        <li><a href="#">Ayuda</a></li>
+                        <li><a href="logout">Cerrar Sesión</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<body>
-	
-<div class="theme-layout">
-	<header>
-		<div class="header_inner">
-			<div class="left-side">
-				<!-- Logo -->
-				<div id="logo" class=" uk-hidden@s">
-					<a href="home.html">
-						<b><h1 style="text-transform: uppercase;">Futboler.os</h1></b>
-					</a>
-				</div>
-
-				<!--<div class="triger" uk-toggle="target: #wrapper ; cls: sidebar-active">
-					<i class="uil-bars"></i>
-				</div>-->
-				<form action="/search" method="POST" class="lg:block hidden">
-					{% csrf_token%}
-				<div class="header_search" style="display: flex; align-items: center; gap: 5px;">
-					<a href="/">
-						<img src="{% static 'images/resources/football.svg' %}" alt="football" width="34" height="34" style="filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);">
-					</a>
-					<input type="text" name="username" placeholder="Busca un usuario... o equipo">&nbsp; &nbsp;
-					<button type="submit"><i class="fa fa-search fa-1x"></i></button>
-				</div>
-				</form>
-			</div>
-			<div class="right-side lg:pr-4">
-				 <!-- upload -->
-				<a href="#"
-					class="bg-pink-500 flex font-bold hidden hover:bg-pink-600 hover:text-white inline-block items-center lg:block max-h-10 mr-4 px-4 py-2 rounded shado text-white">
-					<ion-icon name="add-circle" class="-mb-1
-					 mr-1 opacity-90 text-xl uilus-circle"></ion-icon> Subir una foto
-				</a>
-				 <!-- upload dropdown box -->
-				<div uk-dropdown="pos: top-right;mode:click ; animation: uk-animation-slide-bottom-small" class="header_dropdown">
-
-					<!-- notivication header -->
-					<div class="px-4 py-3 -mx-5 -mt-4 mb-5 border-b">
-						<h4>Sube tus fotos y compartelas con el mundo</h4>
-					</div>
-
-					<!-- notification contents -->
-					
-					<div class="flex justify-center flex-center text-center">
-
-						<div class="flex flex-col choose-upload text-center">
-						   
-							<div class="bg-gray-100 border-2 border-dashed flex flex-col h-24 items-center justify-center relative w-full rounded-lg  ">
-								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-12">
-									<path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z" />
-									<path d="M9 13h2v5a1 1 0 11-2 0v-5z" />
-								</svg>
-							</div>
-
-							<form action="upload" method="POST" enctype="multipart/form-data" >
-							{% csrf_token %}
-							<p class="my-3 leading-6"> Sube una imagen
-							</p>
-							
-								<div>
-									<input type="file" name="image_upload">
-									{% comment %} <a href="#" class="button soft-warning small"> elegir archivo</a> {% endcomment %}
-									<textarea class="button soft-warning small" name="caption" placeholder="Escribe una descripción" ></textarea>
-									<br>
-									<button class="button bg-blue-700" type = "submit" >Subir</button>
-								</div>
-							</form>
-						</div>
-					
-					</div>
-					<div class="px-4 py-3 -mx-5 -mb-4 mt-5 border-t text-sm">
-						Your Video size Must be Maxmium 999MB
-					</div>
-				</div>
-				
-				 <!-- Notification -->
-
-				{% comment %} <a href="#" class="header-links-item">
-					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none"><path d="M12 22a2.02 2.02 0 0 1-2.01-2h4a2.02 2.02 0 0 1-.15.78a2.042 2.042 0 0 1-1.44 1.18h-.047A1.922 1.922 0 0 1 12 22zm8-3H4v-2l2-1v-5.5a8.065 8.065 0 0 1 .924-4.06A4.654 4.654 0 0 1 10 4.18V2h4v2.18c2.579.614 4 2.858 4 6.32V16l2 1v2z" fill="currentColor"/></g></svg>
-				</a>
-				<div uk-drop="mode: click;offset: 4" class="header_dropdown">
-					<h4
-						class="-mt-5 -mx-5 bg-gradient-to-t from-gray-100 to-gray-50 border-b font-bold px-6 py-3">
-						Notification </h4>
-					<ul class="dropdown_scrollbar" data-simplebar>
-						<li>
-							<a href="#">
-								<div class="drop_avatar"> <img src="{% static 'assets/images/avatars/avatar-1.jpg' %}" alt="">
-								</div>
-								<div class="drop_content">
-									<p> <strong class="text-link" >Taiye</strong>  
-										<span class="text-link"> is following you  </span>
-									</p>
-									<span class="time-ago"> 2 hours ago </span>
-								</div>
-							</a>
-						</li>
-						
-
-					</ul>
-					<a href="#" class="see-all">See all</a>
-				</div> {% endcomment %}
-
-				<!-- Messages -->
-
-				{% comment %} <a href="#" class="header-links-item">
-					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="0.5em" height="0.5em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><g fill="currentColor"><path d="M2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/></g></svg>
-				</a>
-				<div uk-drop="mode: click;offset: 4" class="header_dropdown">
-					<h4
-						class="-mt-5 -mx-5 bg-gradient-to-t from-gray-100 to-gray-50 border-b font-bold px-6 py-3">
-						Messages </h4>
-					<ul class="dropdown_scrollbar" data-simplebar>
-						<li>
-							<a href="#">
-								<div class="drop_avatar"> <img src="{% static 'assets/images/avatars/avatar-1.jpg' %}" alt="">
-								</div>
-								<div class="drop_content">
-									<strong> Taiye </strong> <time> 6:43 PM</time>
-									<p> hi tomi </p>
-								</div>
-							</a>
-						</li>
-						
-
-
-					</ul>
-					<a href="#" class="see-all">See all</a>
-				</div> {% endcomment %}
-
-				<!-- profile -->
-
-				<a href="#">
-					<img src="{{user_profile.profileimg.url}}" class="header-avatar" alt="">
-				</a>
-				<div uk-drop="mode: click;offset:9" class="header_dropdown profile_dropdown border-t">
-					<ul>
-						<li><a href="/profile/{{user.username}}">Mi Perfil</a> </li>
-						<li><a href="{% url 'my_team' %}" title="Mi Equipo">Mi Equipo</a><li>
-						<li><a href="/settings">Configuración</a> </li>
-						<li><a href="#">Ayuda</a> </li>
-						<li><a href="logout">Cerrar Sesión</a></li>
-					</ul>
-				</div>
-
-			</div>
-		</div>
-	</header>
-
-    <section>
-		<div class="feature-photo">
-			<figure><img src="{{ group.banner.url }}" alt="Banner" style="border-radius: 20px; padding: 10px;"></figure>
-			<div class="container-fluid">
-                <div class="row merged">
-                    <div class="col-lg-2 col-sm-3">
-                        <div class="user-avatar">
-                            <figure class="profile-image-container">
-                                <img src="{{ group.logo.url }}" class="profile-image" alt="">
-                            </figure>
+        <section>
+            <div class="feature-photo">
+                <figure><img src="{{ group.banner.url }}" alt="Banner" style="border-radius: 20px; padding: 10px;"></figure>
+                <div class="container-fluid">
+                    <div class="row merged">
+                        <div class="col-lg-2 col-sm-3">
+                            <div class="user-avatar">
+                                <figure class="profile-image-container">
+                                    <img src="{{ group.logo.url }}" class="profile-image" alt="">
+                                </figure>
+                            </div>
                         </div>
+                        <form>
+                            <div class="add-btn" style="display: flex; align-items: center; gap: 20px; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); border-radius: 10px; padding: 12px;">
+                                <span style="color: white; font-size: 27px;"><b>{{ group.group_name }}</b></span>
+                                <span style="color: white; font-size: 27px;"><b>{{ group.number_of_posts }} Posts</b></span>
+                                <span style="color: white; font-size: 27px;"><b>{{ group.number_of_matches }} Partidos</b></span>
+                                {% if is_creator %}
+                                    <a href="{% url 'groupsetting' %}" class="button-edit">Editar Grupo</a>
+                                    <a href="{% url 'delete_group' group.id %}" class="button-delete" onclick="return confirm('¿Estás seguro de que deseas eliminar este grupo?');">Eliminar Grupo</a>
+                                {% endif %}
+                                <a href="#" title="" data-ripple=""><button style="background-color: #ffc0cb; border: #ffc0cb;">+ Invitar</button></a>
+                            </div>
+                        </form>
                     </div>
-			<form>
-				<div class="add-btn" style="display: flex; align-items: center; gap: 20px; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); border-radius: 10px; padding: 12px;">
-					<span style="color: white; font-size: 27px;"><b>{{ group.group_name }}</b></span>
-					<span style="color: white; font-size: 27px;"><b>{{ group.number_of_posts }} Posts</b></span>
-					<span style="color: white; font-size: 27px;"><b>{{ group.number_of_matches }} Partidos</b></span>
-					{% if is_creator %}
-						<a href="{% url 'groupsetting' %}" class="button-edit">Editar Grupo</a>
-						<a href="{% url 'delete_group' group.id %}" class="button-delete" onclick="return confirm('¿Estás seguro de que deseas eliminar este grupo?');">Eliminar Grupo</a>
-					{% endif %}
-					<a href="#" title="" data-ripple=""><button style="background-color: #ffc0cb; border: #ffc0cb;">+ Invitar</button></a>
-				</div>
-			</form>
-		</div>
-	</section>
-	
+                </div>
+            </div>
+        </section>
 
-    <section>
-        <div class="gray-bg">
-            <div class="container-fluid">
+        <!-- Resto del contenido -->
+
+        <footer>
+            <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="row" id="page-contents">
-                            <div class="col-lg-3">
-                                <aside class="sidebar static" hidden></aside>
-                            </div>
-                            <div class="col-lg-6">
-                                <div>
-                                    {% if not user_posts %}
-                                        <div class="bg-white shadow rounded-md mb-8 mx-auto p-4 text-center" style="max-width: 95%;">
-                                            <p class="text-lg">No hay publicaciones</p>
-                                        </div>
-                                    {% else %}
-                                        {% for post in user_posts reversed %}
-                                        <div class="bg-white shadow rounded-md mb-8 mx-auto" style="max-width: 95%;">
-                                            <div class="flex justify-between items-center px-4 py-3">
-                                                <div class="flex flex-1 items-center space-x-4">
-                                                    <a href="#">
-                                                        <div class="bg-gradient-to-tr from-yellow-600 to-pink-600 p-0.5 rounded-full">  
-                                                            <img src="{% static 'assets/images/avatars/avatar-2.jpg' %}" class="bg-gray-200 border border-white rounded-full w-8 h-8">
-                                                        </div>
-                                                    </a>
-                                                    <span class="block capitalize font-semibold "> <a href='#'>{{ post.user }}</a> </span>
-                                                </div>
-                                            </div>
-                                            {% if post.image %}
-                                            <div uk-lightbox>
-                                                <a href="{{ post.image.url }}">  
-                                                    <img src="{{ post.image.url }}" alt="" class="w-full h-full object-cover">
-                                                </a>
-                                            </div>
-                                            <div class="py-3 px-4 space-y-3"> 
-                                                <div class="flex space-x-4 lg:font-bold">
-                                                    <a href="/like-post?post_id={{ post.id }}" class="flex items-center space-x-2">
-                                                        <div class="p-2 rounded-full text-black">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="25" height="25">
-                                                                <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
-                                                            </svg>
-                                                            {% if post.no_of_likes == 0 %}
-                                                            <p>Sin likes</p>
-                                                            {% elif post.no_of_likes == 1 %}
-                                                            <p>Le ha gustado a {{ post.no_of_likes }} persona</p>
-                                                            {% else %}
-                                                            <p>Le ha gustado a {{ post.no_of_likes }} personas</p>
-                                                            {% endif %}
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            {% endif %}
-                                        </div>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <aside class="sidebar static" hidden></aside>
-                            </div>
-                        </div>
+                        <p>Futboler.os © 2024 All Rights Reserved.</p>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <p>Futboler.os © 2024 All Rights Reserved.</p>
-                </div>
-            </div>
-        </div>
-    </footer>
-</div>
+        </footer>
+    </div>
 </body>
 
 </html>

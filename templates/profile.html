@@ -24,96 +24,49 @@
 </head>
 <body>
 	{% csrf_token %}
-<!--<div class="se-pre-con"></div>-->
-<div class="theme-layout">
-	
-	<header>
-		<div class="header_inner">
-			<div class="left-side">
-				<!-- Logo -->
-				<div id="logo" class=" uk-hidden@s">
-					<a href="home.html">
-						<b><h1 style="text-transform: uppercase;">Futboler.os</h1></b>
-					</a>
-				</div>
-
-				<div class="header_search" style="display: flex; align-items: center; gap: 5px;">
-					<a href="/">
-						<img src="{% static 'images/resources/football.svg' %}" alt="football" width="34" height="34" style="filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);">
-					</a>
-					<input type="text" placeholder="Search for username..">
-					
-				</div>
-
-			</div>
-			<div class="right-side lg:pr-4">
-				 <!-- upload -->
-				<a href="#"
-					class="bg-pink-500 flex font-bold hidden hover:bg-pink-600 hover:text-white inline-block items-center lg:block max-h-10 mr-4 px-4 py-2 rounded shado text-white">
-					<ion-icon name="add-circle" class="-mb-1
-					 mr-1 opacity-90 text-xl uilus-circle"></ion-icon> Subir una foto
-				</a>
-				 <!-- upload dropdown box -->
-				<div uk-dropdown="pos: top-right;mode:click ; animation: uk-animation-slide-bottom-small" class="header_dropdown">
-
-					<!-- notivication header -->
-					<div class="px-4 py-3 -mx-5 -mt-4 mb-5 border-b">
-						<h4>Sube tus fotos y compartelas con el mundo</h4>
-					</div>
-
-					<!-- notification contents -->
-					
-					<div class="flex justify-center flex-center text-center">
-
-						<div class="flex flex-col choose-upload text-center">
-						   
-							<div class="bg-gray-100 border-2 border-dashed flex flex-col h-24 items-center justify-center relative w-full rounded-lg  ">
-								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-12">
-									<path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z" />
-									<path d="M9 13h2v5a1 1 0 11-2 0v-5z" />
-								</svg>
-							</div>
-
-							<form action="/upload" method="POST" enctype="multipart/form-data" >
-							{% csrf_token %}
-							<p class="my-3 leading-6"> Sube una imagen
-							</p>
-							
-								<div>
-									<input type="file" name="image_upload">
-									{% comment %} <a href="#" class="button soft-warning small"> elegir archivo</a> {% endcomment %}
-									<textarea class="button soft-warning small" name="caption" placeholder="Escribe una descripción" ></textarea>
-									<br>
-									<button class="button bg-blue-700" type = "submit" >Subir</button>
-								</div>
-							</form>
-						</div>
-
-					</div>
-					<div class="px-4 py-3 -mx-5 -mb-4 mt-5 border-t text-sm">
-						Your Video size Must be Maxmium 999MB
-					</div>
-				</div>
-
-				<!-- profile -->
-
-				<a href="#">
-					<img src="{{logged_user_profile.profileimg.url}}" class="header-avatar" alt="">
-				</a>
-				<div uk-drop="mode: click;offset:9" class="header_dropdown profile_dropdown border-t">
-					<ul>
-						<li><a href="/profile/{{user.username}}">Mi Perfil</a> </li>
-						<li><a href="{% url 'my_team' %}" title="Mi Equipo">Mi Equipo</a><li>
-						<li><a href="/settings">Configuración</a> </li>
-						<li><a href="#">Ayuda</a> </li>
-						<li><a href="logout">Cerrar Sesión</a></li>
-					</ul>
-				</div>
-
-			</div>
-		</div>
-	</header>
-	
+	<div class="theme-layout">
+        <!-- Barra de navegación -->
+        <div class="nav" style="display: flex; align-items: center; justify-content: space-between;">
+            <!-- Sección izquierda: Título y elementos principales -->
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <h1 class="title">Perfil</h1>
+                <div class="navbar-icons" style="display: flex; gap: 10px;">
+                    <a href="/"><i class="fas fa-home"></i></a>
+                    <a href="#"><i class="fas fa-futbol"></i></a>
+                    <a href="{% url 'my_team' %}"><i class="fas fa-users"></i></a>
+                    <a href="#"><i class="fas fa-bell"></i></a>
+                    <a href="setting"><i class="fas fa-cog"></i></a>
+                </div>
+            </div>
+    
+            <!-- Sección derecha: Foto de perfil con menú desplegable -->
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <!-- Formulario de búsqueda -->
+                <form action="/search" method="POST" class="lg:block hidden" style="margin-right: 10px;">
+                    {% csrf_token %}
+                    <input type="text" name="username" placeholder="Busca un usuario... o equipo">
+                </form>
+    
+                <!-- Foto de perfil -->
+                <a href="#">
+                    <img 
+                        src="{{user_profile.profileimg.url}}" 
+						href="/profile/{{user.username}}"
+                        alt="Foto de perfil" 
+                        style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                </a>
+                <div uk-drop="mode: click;offset:9" class="header_dropdown profile_dropdown border-t">
+                    <ul>
+                        <li><a href="/profile/{{user.username}}">Mi Perfil</a></li>
+                        <li><a href="{% url 'my_team' %}" title="Mi Equipo">Mi Equipo</a></li>
+                        <li><a href="/settings">Configuración</a></li>
+                        <li><a href="#">Ayuda</a></li>
+                        <li><a href="logout">Cerrar Sesión</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 	<section>
 			<div class="feature-photo">
 				<figure><img src="{% static 'images/resources/timeline-1.jpg' %}" alt="" style="border-radius: 20px; padding: 10px;"></figure>
