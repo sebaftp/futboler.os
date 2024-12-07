@@ -5,175 +5,86 @@
 
 
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="{% static favicon.png%}" rel="icon" type="image/png">
-    <title>Home</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <title>Futboler.os - {{ user.group.name }}</title>
+
+    {% load static %}
+    <!-- UIkit CSS y JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.15.5/dist/css/uikit.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.5/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.5/dist/js/uikit-icons.min.js"></script>
+    
+    <!-- Estilos adicionales -->
+    <link rel="stylesheet" href="{% static 'css/main.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/color.css' %}">
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/icons.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/uikit.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/tailwind.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body>
     {% csrf_token %}
-            <header>
-                <div class="header_inner">
-                    <div class="left-side">
-                        <!-- Logo -->
-                        <div id="logo" class=" uk-hidden@s">
-                            <a href="home.html">
-                                <b><h1 style="text-transform: uppercase;">Futboler.os</h1></b>
-                            </a>
-                        </div>
+    <div class="theme-layout">
+        <!-- Barra de navegación -->
+        <div class="nav" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background-color: #28a745;">
+            <!-- Sección izquierda: Título y elementos principales -->
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <h1 class="title" style="color: white;">Perfil</h1>
+                <div class="navbar-icons" style="display: flex; gap: 15px; font-size: 20px; color: white;">
+                    <a href="/" style="color: inherit;"><i class="fas fa-home"></i></a>
+                    <a href="#" style="color: inherit;"><i class="fas fa-futbol"></i></a>
+                    <a href="{% url 'my_team' %}" style="color: inherit;"><i class="fas fa-users"></i></a>
 
-                        <!--<div class="triger" uk-toggle="target: #wrapper ; cls: sidebar-active">
-                            <i class="uil-bars"></i>
-                        </div>-->
-                        <form action="/search" method="POST" class="lg:block hidden">
-                            {% csrf_token%}
-                        <div class="header_search" style="display: flex; align-items: center; gap: 5px;">
-                            <a href="/">
-                                <img src="{% static 'images/resources/football.svg' %}" alt="football" width="34" height="34" style="filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);">
-                            </a>
-                            <input type="text" name="username" placeholder="Busca un usuario... o equipo">&nbsp; &nbsp;
-                            <button type="submit"><i class="fa fa-search fa-1x"></i></button>
-                        </div>
-                        </form>
-                    </div>
-                    <div class="right-side lg:pr-4">
-                         <!-- upload -->
-                        <a href="#"
-                            class="bg-pink-500 flex font-bold hidden hover:bg-pink-600 hover:text-white inline-block items-center lg:block max-h-10 mr-4 px-4 py-2 rounded shado text-white">
-                            <ion-icon name="add-circle" class="-mb-1
-                             mr-1 opacity-90 text-xl uilus-circle"></ion-icon> Subir una foto
-                        </a>
-                         <!-- upload dropdown box -->
-                        <div uk-dropdown="pos: top-right;mode:click ; animation: uk-animation-slide-bottom-small" class="header_dropdown">
-    
-                            <!-- notivication header -->
-                            <div class="px-4 py-3 -mx-5 -mt-4 mb-5 border-b">
-                                <h4>Sube tus fotos y compartelas con el mundo</h4>
-                            </div>
-    
-                            <!-- notification contents -->
-                            
-                            <div class="flex justify-center flex-center text-center">
-    
-                                <div class="flex flex-col choose-upload text-center">
-                                   
-                                    <div class="bg-gray-100 border-2 border-dashed flex flex-col h-24 items-center justify-center relative w-full rounded-lg  ">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-12">
-                                            <path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z" />
-                                            <path d="M9 13h2v5a1 1 0 11-2 0v-5z" />
-                                        </svg>
-                                    </div>
-
-                                    <form action="upload" method="POST" enctype="multipart/form-data" >
-                                    {% csrf_token %}
-                                    <p class="my-3 leading-6"> Sube una imagen
-                                    </p>
-                                    
-                                        <div>
-                                            <input type="file" name="image_upload">
-                                            {% comment %} <a href="#" class="button soft-warning small"> elegir archivo</a> {% endcomment %}
-                                            <textarea class="button soft-warning small" name="caption" placeholder="Escribe una descripción" ></textarea>
-                                            <br>
-                                            <button class="button bg-blue-700" type = "submit" >Subir</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            
-                            </div>
-                            <div class="px-4 py-3 -mx-5 -mb-4 mt-5 border-t text-sm">
-                                Your Video size Must be Maxmium 999MB
-                            </div>
-                        </div>
-                        
-                         <!-- Notification -->
-
-                        {% comment %} <a href="#" class="header-links-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none"><path d="M12 22a2.02 2.02 0 0 1-2.01-2h4a2.02 2.02 0 0 1-.15.78a2.042 2.042 0 0 1-1.44 1.18h-.047A1.922 1.922 0 0 1 12 22zm8-3H4v-2l2-1v-5.5a8.065 8.065 0 0 1 .924-4.06A4.654 4.654 0 0 1 10 4.18V2h4v2.18c2.579.614 4 2.858 4 6.32V16l2 1v2z" fill="currentColor"/></g></svg>
-                        </a>
-                        <div uk-drop="mode: click;offset: 4" class="header_dropdown">
-                            <h4
-                                class="-mt-5 -mx-5 bg-gradient-to-t from-gray-100 to-gray-50 border-b font-bold px-6 py-3">
-                                Notification </h4>
-                            <ul class="dropdown_scrollbar" data-simplebar>
-                                <li>
-                                    <a href="#">
-                                        <div class="drop_avatar"> <img src="{% static 'assets/images/avatars/avatar-1.jpg' %}" alt="">
-                                        </div>
-                                        <div class="drop_content">
-                                            <p> <strong class="text-link" >Taiye</strong>  
-                                                <span class="text-link"> is following you  </span>
-                                            </p>
-                                            <span class="time-ago"> 2 hours ago </span>
-                                        </div>
-                                    </a>
-                                </li>
-                                
-
-                            </ul>
-                            <a href="#" class="see-all">See all</a>
-                        </div> {% endcomment %}
-
-                        <!-- Messages -->
-
-                        <a href="/chat" class="header-links-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="0.5em" height="0.5em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><g fill="currentColor"><path d="M2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/></g></svg>
-                        </a>
-                        {% comment %} <div uk-drop="mode: click;offset: 4" class="header_dropdown">
-                            <h4
-                                class="-mt-5 -mx-5 bg-gradient-to-t from-gray-100 to-gray-50 border-b font-bold px-6 py-3">
-                                Messages </h4>
-                            <ul class="dropdown_scrollbar" data-simplebar>
-                                <li>
-                                    <a href="#">
-                                        <div class="drop_avatar"> <img src="{% static 'assets/images/avatars/avatar-1.jpg' %}" alt="">
-                                        </div>
-                                        <div class="drop_content">
-                                            <strong> Taiye </strong> <time> 6:43 PM</time>
-                                            <p> hi tomi </p>
-                                        </div>
-                                    </a>
-                                </li>
-                                
-
-
-                            </ul>
-                            <a href="#" class="see-all">See all</a>
-                        </div> {% endcomment %}
-
-                        <!-- profile -->
-
-                        <a href="#">
-                            <img src="{{user_profile.profileimg.url}}" class="header-avatar" alt="">
-                        </a>
-                        <div uk-drop="mode: click;offset:9" class="header_dropdown profile_dropdown border-t">
-                            <ul>
-                                <li><a href="/profile/{{user.username}}">Mi Perfil</a> </li>
-                                <li><a href="{% url 'my_team' %}" title="Mi Equipo">Mi Equipo</a><li>
-                                <li><a href="/settings">Configuración</a> </li>
-                                <li><a href="#">Ayuda</a> </li>
-                                <li><a href="logout">Cerrar Sesión</a></li>
-                            </ul>
-                        </div>
-
-                    </div>
+                    <!-- Notificaciones desplegables -->
+                    <details style="display: flex; gap: 15px; font-size: 20px; color: white;">
+                        <summary style="cursor: pointer; display: flex; align-items: center; color: inherit; font-size: 20px;">
+                            <i class="fas fa-bell" style="display: flex; gap: 30px; font-size: 30px; color: white, inherit;"></i>
+                        </summary>
+                        <ul style="margin-top: 10px; list-style-type: none; padding: 10px; background-color: white; border: 1px solid #ccc; border-radius: 5px; width: 150px; color: black;">
+                            <li style="margin-bottom: 5px;">Nuevo mensaje de Pedro</li>
+                            <li style="margin-bottom: 5px;">Tu equipo ganó un partido</li>
+                            <li>Recordatorio: evento mañana</li>
+                        </ul>
+                    </details>
+                    
+                    <a href="/settings" style="color: inherit;"><i class="fas fa-cog"></i></a>
                 </div>
-            </header>
+            </div>
+    
+            <!-- Sección derecha: Foto de perfil con menú desplegable -->
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <!-- Formulario de búsqueda -->
+                <form action="/search" method="POST" class="lg:block hidden" style="margin-right: 10px;">
+                    {% csrf_token %}
+                    <input type="text" name="username" placeholder="Busca un usuario... o equipo" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
+                </form>
+    
+                <!-- Foto de perfil con menú desplegable -->
+                <details style="display: inline-block; font-size: inherit;">
+                    <summary style="cursor: pointer; display: flex; align-items: center; color: inherit;">
+                        <img 
+                            src="{{ user_profile.profileimg.url }}" 
+                            alt="Foto de perfil" 
+                            style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                    </summary>
+                    <ul style="margin-top: 10px; list-style-type: none; padding: 10px; background-color: white; border: 1px solid #ccc; border-radius: 5px; width: 150px;">
+                        <li style="margin-bottom: 5px;"><a href="/profile/{{ user.username }}">Mi Perfil</a></li>
+                        <li style="margin-bottom: 5px;"><a href="{% url 'my_team' %}">Mi Equipo</a></li>
+                        <li style="margin-bottom: 5px;"><a href="/settings">Configuración</a></li>
+                        <li style="margin-bottom: 5px;"><a href="#">Ayuda</a></li>
+                        <li><a href="logout">Cerrar Sesión</a></li>
+                    </ul>
+                </details>
+            </div>
+        </div>
+    </div>
 
-            <div class="container m-auto">
 
-                <!--<h1 class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5"> Feed </h1>--->
-
-                <div class="lg:flex justify-center lg:space-x-10 lg:space-y-0 space-y-5">
-
-                    <!-- left sidebar-->
                     <div class="space-y-5 flex-shrink-0 lg:w-7/12">
 
                         <!-- post 1-->

@@ -10,62 +10,78 @@
     <title>Futboler.os - {{ user.group.name }}</title>
 
     {% load static %}
+    <!-- UIkit CSS y JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.15.5/dist/css/uikit.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.5/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.5/dist/js/uikit-icons.min.js"></script>
+    
+    <!-- Estilos adicionales -->
     <link rel="stylesheet" href="{% static 'css/main.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/color.css' %}">
     <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/icons.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/uikit.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/tailwind.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body>
     {% csrf_token %}
-	<div class="theme-layout">
+    <div class="theme-layout">
         <!-- Barra de navegación -->
-        <div class="nav" style="display: flex; align-items: center; justify-content: space-between;">
+        <div class="nav" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background-color: #28a745;">
             <!-- Sección izquierda: Título y elementos principales -->
             <div style="display: flex; align-items: center; gap: 15px;">
-                <h1 class="title">Perfil</h1>
-                <div class="navbar-icons" style="display: flex; gap: 10px;">
-                    <a href="/"><i class="fas fa-home"></i></a>
-                    <a href="#"><i class="fas fa-futbol"></i></a>
-                    <a href="{% url 'my_team' %}"><i class="fas fa-users"></i></a>
-                    <a href="#"><i class="fas fa-bell"></i></a>
-                    <a href="setting"><i class="fas fa-cog"></i></a>
+                <h1 class="title" style="color: white;">Perfil</h1>
+                <div class="navbar-icons" style="display: flex; gap: 15px; font-size: 20px; color: white;">
+                    <a href="/" style="color: inherit;"><i class="fas fa-home"></i></a>
+                    <a href="#" style="color: inherit;"><i class="fas fa-futbol"></i></a>
+                    <a href="{% url 'my_team' %}" style="color: inherit;"><i class="fas fa-users"></i></a>
+
+                    <!-- Notificaciones desplegables -->
+                    <details style="display: flex; gap: 15px; font-size: 20px; color: white;">
+                        <summary style="cursor: pointer; display: flex; align-items: center; color: inherit; font-size: 20px;">
+                            <i class="fas fa-bell" style="display: flex; gap: 30px; font-size: 30px; color: white, inherit;"></i>
+                        </summary>
+                        <ul style="margin-top: 10px; list-style-type: none; padding: 10px; background-color: white; border: 1px solid #ccc; border-radius: 5px; width: 150px; color: black;">
+                            <li style="margin-bottom: 5px;">Nuevo mensaje de Pedro</li>
+                            <li style="margin-bottom: 5px;">Tu equipo ganó un partido</li>
+                            <li>Recordatorio: evento mañana</li>
+                        </ul>
+                    </details>
+                    
+                    <a href="/settings" style="color: inherit;"><i class="fas fa-cog"></i></a>
                 </div>
             </div>
     
             <!-- Sección derecha: Foto de perfil con menú desplegable -->
-            <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
                 <!-- Formulario de búsqueda -->
                 <form action="/search" method="POST" class="lg:block hidden" style="margin-right: 10px;">
                     {% csrf_token %}
-                    <input type="text" name="username" placeholder="Busca un usuario... o equipo">
+                    <input type="text" name="username" placeholder="Busca un usuario... o equipo" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
                 </form>
     
-                <!-- Foto de perfil -->
-                <a href="#">
-                    <img 
-                        src="{{user_profile.profileimg.url}}" 
-						href="/profile/{{user.username}}"
-                        alt="Foto de perfil" 
-                        style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
-                </a>
-                <div uk-drop="mode: click;offset:9" class="header_dropdown profile_dropdown border-t">
-                    <ul>
-                        <li><a href="/profile/{{user.username}}">Mi Perfil</a></li>
-                        <li><a href="{% url 'my_team' %}" title="Mi Equipo">Mi Equipo</a></li>
-                        <li><a href="/settings">Configuración</a></li>
-                        <li><a href="#">Ayuda</a></li>
+                <!-- Foto de perfil con menú desplegable -->
+                <details style="display: inline-block; font-size: inherit;">
+                    <summary style="cursor: pointer; display: flex; align-items: center; color: inherit;">
+                        <img 
+                            src="{{ user_profile.profileimg.url }}" 
+                            alt="Foto de perfil" 
+                            style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                    </summary>
+                    <ul style="margin-top: 10px; list-style-type: none; padding: 10px; background-color: white; border: 1px solid #ccc; border-radius: 5px; width: 150px;">
+                        <li style="margin-bottom: 5px;"><a href="/profile/{{ user.username }}">Mi Perfil</a></li>
+                        <li style="margin-bottom: 5px;"><a href="{% url 'my_team' %}">Mi Equipo</a></li>
+                        <li style="margin-bottom: 5px;"><a href="/settings">Configuración</a></li>
+                        <li style="margin-bottom: 5px;"><a href="#">Ayuda</a></li>
                         <li><a href="logout">Cerrar Sesión</a></li>
                     </ul>
-                </div>
+                </details>
             </div>
         </div>
     </div>
+    
     
 <div class="container" style="margin-top: 50px">
     <h1>Configuración del Grupo</h1>
