@@ -6,6 +6,10 @@ from . import views
 # Configuramos a donde nos lleva cada link
 urlpatterns = [
     path('', views.index, name='index'),
+    path('invite/<int:group_id>/', views.invite_user, name='invite_user'),
+    path('search-users/', views.search_users, name='search_users'),
+    path('send-invitation/<int:group_id>/', views.send_invitation, name='send_invitation'),
+    path('respond-to-invitation/', views.respond_to_invitation, name='respond_to_invitation'),
     path('settings', views.settings, name='settings'),
     path('my_team/', views.my_team, name='my_team'),
     path('search', views.search, name='search'),

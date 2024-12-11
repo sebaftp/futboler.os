@@ -27,27 +27,45 @@
     {% csrf_token %}
     <div class="theme-layout">
         <!-- Barra de navegación -->
-        <div class="nav" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background-color: #28a745;">
+        <div class="nav" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background-color: #28a745; position: sticky; top: 0; z-index: 1000;">
             <!-- Sección izquierda: Título y elementos principales -->
             <div style="display: flex; align-items: center; gap: 15px;">
-                <h1 class="title" style="color: white;">Perfil</h1>
+                <h1 class="title" style="color: white; margin: 0;">Perfil</h1>
                 <div class="navbar-icons" style="display: flex; gap: 15px; font-size: 20px; color: white;">
                     <a href="/" style="color: inherit;"><i class="fas fa-home"></i></a>
                     <a href="#" style="color: inherit;"><i class="fas fa-futbol"></i></a>
                     <a href="{% url 'my_team' %}" style="color: inherit;"><i class="fas fa-users"></i></a>
-
-                    <!-- Notificaciones desplegables -->
-                    <details style="display: flex; gap: 15px; font-size: 20px; color: white;">
-                        <summary style="cursor: pointer; display: flex; align-items: center; color: inherit; font-size: 20px;">
-                            <i class="fas fa-bell" style="display: flex; gap: 30px; font-size: 30px; color: white, inherit;"></i>
-                        </summary>
-                        <ul style="margin-top: 10px; list-style-type: none; padding: 10px; background-color: white; border: 1px solid #ccc; border-radius: 5px; width: 150px; color: black;">
-                            <li style="margin-bottom: 5px;">Nuevo mensaje de Pedro</li>
-                            <li style="margin-bottom: 5px;">Tu equipo ganó un partido</li>
-                            <li>Recordatorio: evento mañana</li>
-                        </ul>
-                    </details>
-                    
+    
+                    <!-- Ícono de notificaciones -->
+                    <div style="position: relative;">
+                        <a href="#" id="notification-icon" style="color: inherit;" uk-tooltip="title: Notificaciones; pos: bottom">
+                            <i class="fas fa-bell" style="padding-top: 18px; font-size: 30px; color: white, inherit;"></i>
+                            <!-- Contador de notificaciones no leídas -->
+                            <span id="notification-count" style="color: red; font-size: 12px; position: absolute; top: -5px; right: -10px;">
+                                {{ notifications.count }}
+                            </span>
+                        </a>
+    
+                        <!-- Panel de notificaciones -->
+                        <div id="notifications" style="display: none; position: absolute; top: 35px; left: 0; background-color: white; padding: 10px; border: 1px solid #ddd; width: 300px; max-height: 300px; overflow-y: auto; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); z-index: 1001;">
+                            {% if notifications.count == 0 %}
+                                <p style="padding: 10px; color: black; text-align: center;">No hay notificaciones</p>
+                            {% else %}
+                                {% for notification in notifications %}
+                                    <div class="notification-item" style="padding: 10px; border-bottom: 1px solid #ddd; color: black;">
+                                        <p>
+                                            <strong>@{{ notification.sender.username }}</strong> te ha invitado a su equipo: <strong>{{ notification.group.group_name }}</strong>
+                                        </p>
+                                        <div style="display: flex; gap: 10px;">
+                                            <button class="accept-btn" data-id="{{ notification.id }}" style="flex: 1; padding: 5px; background-color: #28a745; color: white; border: none; cursor: pointer;">Aceptar</button>
+                                            <button class="reject-btn" data-id="{{ notification.id }}" style="flex: 1; padding: 5px; background-color: #dc3545; color: white; border: none; cursor: pointer;">Rechazar</button>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+    
                     <a href="/settings" style="color: inherit;"><i class="fas fa-cog"></i></a>
                 </div>
             </div>
@@ -78,7 +96,48 @@
                 </details>
             </div>
         </div>
+    
+        <!-- Contenido principal -->
+        <div class="main-content" style="padding: 20px;">
+            <!-- Aquí va el contenido de la página -->
+        </div>
     </div>
+    
+    <script>
+        // Mostrar/ocultar el panel de notificaciones al hacer clic en el ícono
+        document.getElementById('notification-icon').addEventListener('click', function () {
+            const notificationPanel = document.getElementById('notifications');
+            notificationPanel.style.display = notificationPanel.style.display === 'block' ? 'none' : 'block';
+        });
+    
+        // Manejar botones de aceptar/rechazar
+        document.querySelectorAll('.accept-btn, .reject-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const notificationId = button.getAttribute('data-id');
+                const response = button.classList.contains('accept-btn') ? 'accept' : 'reject';
+    
+                fetch('/respond-to-invitation/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({ notification_id: notificationId, response: response })
+                })
+                .then(response => response.json())
+                .then(data => alert(data.message));
+            });
+        });
+    
+        // Cerrar el panel de notificaciones al hacer clic fuera
+        document.addEventListener('click', function (event) {
+            const notificationIcon = document.getElementById('notification-icon');
+            const notificationPanel = document.getElementById('notifications');
+            if (!notificationIcon.contains(event.target) && !notificationPanel.contains(event.target)) {
+                notificationPanel.style.display = 'none';
+            }
+        });
+    </script>
 		<!-- Agrega esto al principio del template -->
     {% if user.is_authenticated %}
         <h1 style="text-align: end; padding-right: 10px">Logged in as : {{ user.username }}</h1>

@@ -28,30 +28,125 @@
     {% csrf_token %}
     <div class="theme-layout">
         <!-- Barra de navegación -->
-        <div class="nav" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background-color: #28a745;">
+        <div class="nav" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background-color: #28a745; position: sticky; top: 0; z-index: 1000;">
             <!-- Sección izquierda: Título y elementos principales -->
             <div style="display: flex; align-items: center; gap: 15px;">
-                <h1 class="title" style="color: white;">Perfil</h1>
+                <h1 class="title" style="color: white; margin: 0;">Perfil</h1>
                 <div class="navbar-icons" style="display: flex; gap: 15px; font-size: 20px; color: white;">
                     <a href="/" style="color: inherit;"><i class="fas fa-home"></i></a>
                     <a href="#" style="color: inherit;"><i class="fas fa-futbol"></i></a>
                     <a href="{% url 'my_team' %}" style="color: inherit;"><i class="fas fa-users"></i></a>
-
-                    <!-- Notificaciones desplegables -->
-                    <details style="display: flex; gap: 15px; font-size: 20px; color: white;">
-                        <summary style="cursor: pointer; display: flex; align-items: center; color: inherit; font-size: 20px;">
-                            <i class="fas fa-bell" style="display: flex; gap: 30px; font-size: 30px; color: white, inherit;"></i>
-                        </summary>
-                        <ul style="margin-top: 10px; list-style-type: none; padding: 10px; background-color: white; border: 1px solid #ccc; border-radius: 5px; width: 150px; color: black;">
-                            <li style="margin-bottom: 5px;">Nuevo mensaje de Pedro</li>
-                            <li style="margin-bottom: 5px;">Tu equipo ganó un partido</li>
-                            <li>Recordatorio: evento mañana</li>
-                        </ul>
-                    </details>
-                    
+    
+                    <!-- Ícono de notificaciones -->
+                    <div style="position: relative;">
+                        <a href="#" id="notification-icon" style="color: inherit;" uk-tooltip="title: Notificaciones; pos: bottom">
+                            <i class="fas fa-bell" style="padding-top: 18px; font-size: 30px; color: white, inherit;"></i>
+                            <!-- Contador de notificaciones no leídas -->
+                            <span id="notification-count" style="color: red; font-size: 12px; position: absolute; top: -5px; right: -10px;">
+                                {{ notifications.count }}
+                            </span>
+                        </a>
+    
+                        <!-- Panel de notificaciones -->
+                        <div id="notifications" style="display: none; position: absolute; top: 35px; left: 0; background-color: white; padding: 10px; border: 1px solid #ddd; width: 300px; max-height: 300px; overflow-y: auto; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); z-index: 1001;">
+                            {% if notifications.count == 0 %}
+                                <p style="padding: 10px; color: black; text-align: center;">No hay notificaciones</p>
+                            {% else %}
+                                {% for notification in notifications %}
+                                    <div class="notification-item" style="padding: 10px; border-bottom: 1px solid #ddd; color: black;">
+                                        <p>
+                                            <strong>@{{ notification.sender.username }}</strong> te ha invitado a su equipo: <strong>{{ notification.group.group_name }}</strong>
+                                        </p>
+                                        <div style="display: flex; gap: 10px;">
+                                            <button class="accept-btn" data-id="{{ notification.id }}" style="flex: 1; padding: 5px; background-color: #28a745; color: white; border: none; cursor: pointer;">Aceptar</button>
+                                            <button class="reject-btn" data-id="{{ notification.id }}" style="flex: 1; padding: 5px; background-color: #dc3545; color: white; border: none; cursor: pointer;">Rechazar</button>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+    
                     <a href="/settings" style="color: inherit;"><i class="fas fa-cog"></i></a>
                 </div>
             </div>
+    
+            <!-- Sección derecha: Foto de perfil con menú desplegable -->
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <!-- Formulario de búsqueda -->
+                <form action="/search" method="POST" class="lg:block hidden" style="margin-right: 10px;">
+                    {% csrf_token %}
+                    <input type="text" name="username" placeholder="Busca un usuario... o equipo" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
+                </form>
+    
+                <!-- Foto de perfil con menú desplegable -->
+                <details style="display: inline-block; font-size: inherit;">
+                    <summary style="cursor: pointer; display: flex; align-items: center; color: inherit;">
+                        <img 
+                            src="{{ user_profile.profileimg.url }}" 
+                            alt="Foto de perfil" 
+                            style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                    </summary>
+                    <ul style="margin-top: 10px; list-style-type: none; padding: 10px; background-color: white; border: 1px solid #ccc; border-radius: 5px; width: 150px;">
+                        <li style="margin-bottom: 5px;"><a href="/profile/{{ user.username }}">Mi Perfil</a></li>
+                        <li style="margin-bottom: 5px;"><a href="{% url 'my_team' %}">Mi Equipo</a></li>
+                        <li style="margin-bottom: 5px;"><a href="/settings">Configuración</a></li>
+                        <li style="margin-bottom: 5px;"><a href="#">Ayuda</a></li>
+                        <li><a href="/logout">Cerrar Sesión</a></li>
+                    </ul>
+                </details>
+            </div>
+        </div>
+    
+        <!-- Contenido principal -->
+        <div class="main-content" style="padding: 20px;">
+            <!-- Aquí va el contenido de la página -->
+        </div>
+    </div>
+    
+    <script>
+        // Mostrar/ocultar el panel de notificaciones al hacer clic en el ícono
+        document.getElementById('notification-icon').addEventListener('click', function () {
+            const notificationPanel = document.getElementById('notifications');
+            notificationPanel.style.display = notificationPanel.style.display === 'block' ? 'none' : 'block';
+        });
+    
+        // Manejar botones de aceptar/rechazar
+        document.querySelectorAll('.accept-btn, .reject-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const notificationId = button.getAttribute('data-id');
+                const response = button.classList.contains('accept-btn') ? 'accept' : 'reject';
+    
+                fetch('/respond-to-invitation/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({ notification_id: notificationId, response: response })
+                })
+                .then(response => response.json())
+                .then(data => alert(data.message));
+            });
+        });
+    
+        // Cerrar el panel de notificaciones al hacer clic fuera
+        document.addEventListener('click', function (event) {
+            const notificationIcon = document.getElementById('notification-icon');
+            const notificationPanel = document.getElementById('notifications');
+            if (!notificationIcon.contains(event.target) && !notificationPanel.contains(event.target)) {
+                notificationPanel.style.display = 'none';
+            }
+        });
+    </script>
+    
+    
+    
+    
+    
+    
+    
+    
     
             <!-- Sección derecha: Foto de perfil con menú desplegable -->
             <div style="display: flex; align-items: center; gap: 15px;">
@@ -81,47 +176,208 @@
         </div>
     </div>
 
-        <section>
-            <div class="feature-photo">
-                <figure><img src="{{ group.banner.url }}" alt="Banner" style="border-radius: 20px; padding: 10px;"></figure>
-                <div class="container-fluid">
-                    <div class="row merged">
-                        <div class="col-lg-2 col-sm-3">
-                            <div class="user-avatar">
-                                <figure class="profile-image-container">
-                                    <img src="{{ group.logo.url }}" class="profile-image" alt="">
-                                </figure>
-                            </div>
+    <section>
+        <div class="feature-photo">
+            <figure><img src="{{ group.banner.url }}" alt="Banner" style="border-radius: 20px; padding: 10px;"></figure>
+            <div class="container-fluid">
+                <div class="row merged">
+                    <div class="col-lg-2 col-sm-3">
+                        <div class="user-avatar">
+                            <figure class="profile-image-container">
+                                <img src="{{ group.logo.url }}" class="profile-image" alt="">
+                            </figure>
                         </div>
-                        <form>
-                            <div class="add-btn" style="display: flex; align-items: center; gap: 20px; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); border-radius: 10px; padding: 12px;">
-                                <span style="color: white; font-size: 27px;"><b>{{ group.group_name }}</b></span>
-                                <span style="color: white; font-size: 27px;"><b>{{ group.number_of_posts }} Posts</b></span>
-                                <span style="color: white; font-size: 27px;"><b>{{ group.number_of_matches }} Partidos</b></span>
-                                {% if is_creator %}
-                                    <a href="{% url 'groupsetting' %}" class="button-edit">Editar Grupo</a>
-                                    <a href="{% url 'delete_group' group.id %}" class="button-delete" onclick="return confirm('¿Estás seguro de que deseas eliminar este grupo?');">Eliminar Grupo</a>
-                                {% endif %}
-                                <a href="#" title="" data-ripple=""><button style="background-color: #ffc0cb; border: #ffc0cb;">+ Invitar</button></a>
-                            </div>
-                        </form>
                     </div>
+                    <form>
+                        <div class="add-btn" style="display: flex; align-items: center; gap: 20px; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); border-radius: 10px; padding: 12px;">
+                            <span style="color: white; font-size: 27px;"><b>{{ group.group_name }}</b></span>
+                            <span style="color: white; font-size: 27px;"><b>{{ group.number_of_posts }} Posts</b></span>
+                            <span style="color: white; font-size: 27px;"><b>{{ group.number_of_matches }} Partidos</b></span>
+                            {% if is_creator %}
+                                <a href="{% url 'groupsetting' %}" class="button-edit">Editar Grupo</a>
+                                <a href="{% url 'delete_group' group.id %}" class="button-delete" onclick="return confirm('¿Estás seguro de que deseas eliminar este grupo?');">Eliminar Grupo</a>
+                            {% endif %}
+                            <button type="button" onclick="UIkit.modal('#inviteModal').show();" style="background-color: #ffc0cb; border: none;">+ Invitar</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Resto del contenido -->
+    <!-- Modal para invitar usuarios -->
+    <div id="inviteModal" uk-modal>
+        <div class="uk-modal-dialog uk-modal-body">
+            <h2 class="uk-modal-title">Invitar Usuarios</h2>
+            <input type="text" id="user-search" placeholder="Buscar usuario..." class="uk-input" required>
+            <div id="search-results" style="margin-top: 10px;"></div>
+        </div>
+    </div>
 
-        <footer>
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <p>Futboler.os © 2024 All Rights Reserved.</p>
+<script>
+    function sendInvitation() {
+        const username = document.querySelector('input[name="username"]').value;
+        const groupId = {{ group.id }};
+        
+        fetch(`/send-invitation/${groupId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({ username: username })
+        }).then(response => response.json())
+          .then(data => alert(data.message));
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('user-search');
+        const resultContainer = document.getElementById('search-results');
+    
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value;
+    
+            if (query.length > 2) {
+                fetch(`/search-users/?query=${encodeURIComponent(query)}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    resultContainer.innerHTML = '';
+                    if (data.users.length > 0) {
+                        data.users.forEach(user => {
+                            const userElement = document.createElement('div');
+                            userElement.textContent = `${user.first_name} ${user.last_name} (@${user.username})`;
+                            userElement.classList.add('search-result-item');
+                            userElement.addEventListener('click', () => {
+                                fetch(`/send-invitation/${groupId}/`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRFToken': '{{ csrf_token }}'
+                                    },
+                                    body: JSON.stringify({ username: user.username })
+                                }).then(response => response.json())
+                                  .then(data => alert(data.message));
+                            });
+                            resultContainer.appendChild(userElement);
+                        });
+                    } else {
+                        resultContainer.innerHTML = '<p>No se encontraron usuarios.</p>';
+                    }
+                });
+            } else {
+                resultContainer.innerHTML = '';
+            }
+        });
+    });
+    
+</script>
+            </form>
+            <button class="uk-modal-close uk-button uk-button-default" style="margin-top: 10px;">Cerrar</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>Futboler.os © 2024 Todos los derechos reservados.</p>
                     </div>
                 </div>
             </div>
         </footer>
-    </div>
-</body>
 
+        <!-- Scripts adicionales -->
+        <script>
+            // Manejo de eventos y otras configuraciones
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('Página cargada completamente.');
+            });
+
+            // Confirmar eliminación de grupo
+            const deleteButtons = document.querySelectorAll('.button-delete');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function(event) {
+                    const confirmed = confirm('¿Estás seguro de que deseas eliminar este grupo?');
+                    if (!confirmed) {
+                        event.preventDefault();
+                    }
+                });
+            });
+        </script>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('user-search');
+            const resultContainer = document.getElementById('search-results');
+            const groupId = 1; // Cambiar por el ID dinámico del grupo si es necesario
+        
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value;
+        
+                if (query.length > 2) { // Empieza a buscar si hay al menos 3 caracteres
+                    fetch(`/search-users/?query=${encodeURIComponent(query)}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        resultContainer.innerHTML = ''; // Limpia los resultados anteriores
+        
+                        if (data.users.length > 0) {
+                            data.users.forEach(user => {
+                                // Crear contenedor del usuario
+                                const userElement = document.createElement('div');
+                                userElement.classList.add('search-result-item');
+                                userElement.style.display = 'flex';
+                                userElement.style.justifyContent = 'space-between';
+                                userElement.style.alignItems = 'center';
+                                userElement.style.marginBottom = '10px';
+        
+                                // Añadir texto del usuario
+                                const userInfo = document.createElement('span');
+                                userInfo.textContent = `${user.first_name} ${user.last_name} (@${user.username})`;
+                                userElement.appendChild(userInfo);
+        
+                                // Crear botón de invitar
+                                const inviteButton = document.createElement('button');
+                                inviteButton.textContent = 'Invitar';
+                                inviteButton.style.backgroundColor = '#ffc0cb';
+                                inviteButton.style.border = 'none';
+                                inviteButton.style.padding = '5px 10px';
+                                inviteButton.style.cursor = 'pointer';
+        
+                                // Manejar el evento de invitación
+                                inviteButton.addEventListener('click', () => {
+                                    fetch(`/send-invitation/${groupId}/`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRFToken': '{{ csrf_token }}',
+                                        },
+                                        body: JSON.stringify({ username: user.username })
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        alert(data.message);
+                                    });
+                                });
+        
+                                // Añadir botón al contenedor del usuario
+                                userElement.appendChild(inviteButton);
+        
+                                // Añadir el contenedor al resultado
+                                resultContainer.appendChild(userElement);
+                            });
+                        } else {
+                            resultContainer.innerHTML = '<p>No se encontraron usuarios.</p>';
+                        }
+                    });
+                } else {
+                    resultContainer.innerHTML = ''; // Limpia si el término es demasiado corto
+                }
+            });
+        });
+        
+        
+    </script>
+</body>
 </html>

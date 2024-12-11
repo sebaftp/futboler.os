@@ -119,3 +119,11 @@ class Reporte(models.Model):
     def __str__(self):
         return f"Reporte por {self.usuario.username if self.usuario else 'Anonimo'} - {self.motivo}"
 
+class Notification(models.Model):
+    sender = models.ForeignKey(User, related_name='sent_notifications', on_delete=models.CASCADE)
+    receiver = models.ForeignKey(User, related_name='received_notifications', on_delete=models.CASCADE)
+    message = models.TextField()
+    group = models.ForeignKey('Group', on_delete=models.CASCADE)  # Grupo relacionado
+    is_read = models.BooleanField(default=False)  # Si la notificación fue leída
+    created_at = models.DateTimeField(auto_now_add=True)  # Fecha de creación
+    accepted = models.BooleanField(null=True, blank=True)  # Si aceptó o rechazó

@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+import json
 from django.urls import reverse
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
@@ -6,10 +8,30 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from itertools import chain
 from django.db.models import Q
-from .models import Profile, Post, LikePost, Group, Thread, ChatMessage, Partido, Reporte
+from .models import Profile, Post, LikePost, Group, Thread, ChatMessage, Partido, Reporte, Notification
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
+def group_detail(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+    # Filtramos las notificaciones no leídas de este usuario
+    notifications = Notification.objects.filter(receiver=request.user, is_read=False)
+
+    context = {
+        'group': group,
+        'notifications': notifications,
+    }
+
+    return render(request, 'groups.html', context)
+def invite_user(request, group_id):
+    group = get_object_or_404(Group, id=group_id)  # Verifica que el grupo exista
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        # Lógica para enviar la invitación
+        messages.success(request, f"Se ha enviado la invitación a {email} para el grupo {group.group_name}.")
+        return redirect('groups', id=group_id)
+    return render(request, 'invite_user.html', {'group': group})
 # DEfinimos la url en la que el usuario sera redirigido si no a iniciado sesión
 @login_required(login_url="signin")
 def index(request):
@@ -371,3 +393,73 @@ def report_view(request, user_report_id):
         'usuario_reportado': usuario_reportado,
         'perfil_reportado': perfil_reportado
     })
+    
+def search_users(request):
+    query = request.GET.get('query', '')
+    if query:
+        users = User.objects.filter(
+            Q(username__icontains=query) | Q(first_name__icontains=query) | Q(last_name__icontains=query)
+        ).values('id', 'username', 'first_name', 'last_name')
+        return JsonResponse({'users': list(users)})
+    return JsonResponse({'users': []})
+
+
+def send_invitation(request, group_id):
+    if request.method == 'POST':
+        group = get_object_or_404(Group, id=group_id)
+        username = request.POST.get('username') or json.loads(request.body).get('username')
+        invited_user = get_object_or_404(User, username=username)
+
+        # Crear la notificación
+        Notification.objects.create(
+            sender=request.user,
+            receiver=invited_user,
+            group=group,
+            message=f"@{request.user.username} te ha invitado a unirte a su equipo '{group.group_name}'."
+        )
+
+        return JsonResponse({'message': f'Invitación enviada a {username}.'})
+
+
+@csrf_exempt
+def respond_to_invitation(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        notification_id = data.get('notification_id')
+        response = data.get('response')
+
+        notification = get_object_or_404(Notification, id=notification_id)
+
+        if response == 'accept':
+            # Lógica para agregar al usuario al grupo
+            notification.group.members.add(notification.receiver)
+            notification.accepted = True
+        elif response == 'reject':
+            notification.accepted = False
+
+        notification.is_read = True
+        notification.save()
+
+        return JsonResponse({'message': f'Invitación {"aceptada" if response == "accept" else "rechazada"}.'})
+
+def group_view(request):
+    group = Group.objects.filter(members=request.user).first()
+    is_creator = group.creator == request.user if group else False
+    user_profile = Profile.objects.get(user=request.user)
+
+    return render(request, 'groupsetting.html', {
+        'group': group,
+        'is_creator': is_creator,
+        'user_profile': user_profile,
+    })
+def create_group_view(request):
+    if request.method == 'POST':
+        form = GroupForm(request.POST, request.FILES)
+        if form.is_valid():
+            group = form.save(commit=False)
+            group.creator = request.user
+            group.save()
+            return redirect('group_profile', group_id=group.id)
+    else:
+        form = GroupForm()
+    return render(request, 'groupsetting.html', {'form': form})
